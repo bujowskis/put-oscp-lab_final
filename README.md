@@ -9,6 +9,9 @@ Prepare solution for one of the final assignments from the course book:
 - **Producer-consumer problem revisited** - Write a program implementing producer and the consumer in a generalized version that makes it possible to run several prod. and cons. at the same time. A buffer of N slots should allow for running up to N concurrent processes, producing and consuming different items. The processes should run in loops with different and variable speeds. The ordering of items being consumed should reflect production and times.
 
 ## Solution
+
+DISCLAIMER - The solution depends on whether the visitor makes up their intentions in advance. If so, a mechanism preventing deadlock can be implemented, such that exactly Na people can be visiting A at the same time. If not, the simpliest (and only, if we don't want to make the customers leave A) way to prevent deadlock is to actually let at max Na-1 people to A at the same time.
+
 At the time of writing this, I opt for the museum problem. These are the initial thoughts on how the algorithm can work:
 1. todo
 
