@@ -39,4 +39,36 @@ This part of the exercise could be optimized without the real-world limitations.
 There's an option to achieve a guaranteed free space in A by making people entering B still taking up a place in A. That gets rid off the problem of having a single reserved space in A, but also reduces the maximum working capacity of the whole museum to just `Na`. For that reason, in real life such an algorithm could be optimized by finding the best number of places in A reserved for people leaving B. But for the sake of this task, the algorithm will reserve a place for each B visitor.
 
 ## Example invocation
-todo
+
+***todo***
+
+### Disclaimer
+Adding visitors differentiates between "only A" and "A and B" visitors. However, from the algorithms' points of view, there is no distinction between those. It is unaware of that and that's why the no distinction property holds.
+
+Also, the added visitors will be coming back after some time. The fact they're the same processes doesn't play any role.
+
+### Main entry point
+Run the `Makefile`. The whole project is built around the `./museum` executable. It is the main entry point to all the functionalities. By executing
+```
+./museum man
+```
+or
+```
+./museum    
+```
+We get the following manual:
+```
+The program is a solution to the museum problem. The available commands:
+
+Starting the museum:
+  ./museum crt no Na Nb     creates museum maximizing no. of visitors at the same time
+  ./museum crt time Na Nb   creates museum minimizing time to leave hall B
+  ./museum dst              destroys the museum
+                    
+Adding visitors:            (X = 1, 2, 4 or 8)
+  ./museum A X              adds X visitors that will not enter B
+  ./museum B X              adds X visitors that will enter B
+```
+
+### Maximize visitors - step by step
+Create museum with Na and Nb capacities using `./museum crt no Na Nb`. In separate terminals, add the visitors using supported 
