@@ -49,7 +49,7 @@ void createNo(const int Na, const int Nb) {
             fprintf(stdout, "sem_open /workA\n");
             exit(10);
         }
-        fprintf(stdout, "Museum opened\n");
+        fprintf(stdout, "Museum opened (no. of visitors)\n");
         int valA, valB, valW;
         size_t seconds = 0;
         while (1) {
@@ -58,7 +58,7 @@ void createNo(const int Na, const int Nb) {
             sem_getvalue(workA, &valW);
             sem_getvalue(hallA, &valA);
             sem_getvalue(hallB, &valB);
-            fprintf(stdout, "\tvisitors: hallA = %d,\thallB = %d\t(workA = %d)\ttime: %lu seconds\n", Na - valA, Nb - valB, Na - 1 - valW, seconds);
+            fprintf(stdout, "\tvisitors:\thallA = %d/%d,\thallB = %d/%d,\tworkA = %d/%d\ttime: %lus\n", Na - valA, Na, Nb - valB, Nb, Na - 1 - valW, Na - 1, seconds);
         }
     } else
         fprintf(stdout, "Na must be greater than Nb\n");
@@ -79,6 +79,16 @@ void createTime(const int Na, const int Nb) {
         if (hallB == SEM_FAILED) {
             fprintf(stdout, "sem_open /workA\n");
             exit(10);
+        }
+        fprintf(stdout, "Museum opened (time of exiting B)\n");
+        int valA, valB;
+        size_t seconds = 0;
+        while (1) {
+            sleep(2);
+            seconds += 2;
+            sem_getvalue(hallA, &valA);
+            sem_getvalue(hallB, &valB);
+            fprintf(stdout, "\tvisitors:\thallA = %d/%d,\thallB = %d/%d\ttime: %lus\n", Na - valA, Na, Nb - valB, Nb, seconds);
         }
     } else
         fprintf(stdout, "Na must be greater than Nb\n");
