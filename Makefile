@@ -2,4 +2,4 @@ all: compile
 
 compile:
 	@echo "Compiling..."
-	gcc -o museum *.c *.h
+	gcc -pthread -o museum *.c *.h
