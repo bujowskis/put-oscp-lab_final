@@ -95,39 +95,92 @@ void createTime(const int Na, const int Nb) {
 }
 
 void museumAddA(const int x) {
+    int f = 0;
     switch (x) {
         case 1:
-            // todo
             break;
         case 2:
-            // todo
+            f++;
             break;
         case 4:
-            // todo
+            f += 2;
             break;
         case 8:
-            // todo
+            f += 3;
             break;
         default:
             fprintf(stdout, "Wrong number of visitors\n\n");
+            return;
+    }
+
+    sem_t *hallA = sem_open("/hallA", O_EXCL);
+    if (hallA == SEM_FAILED) {
+        fprintf(stdout, "Museum not opened (hallA not found)\n");
+        return;
+    }
+    sem_t *hallB = sem_open("/hallB", O_EXCL);
+    if (hallB == SEM_FAILED) {
+        fprintf(stdout, "Museum not opened (hallB not found)\n");
+        return;
+    }
+
+    fprintf(stdout, "(press ctrl+D to start)\n\n");
+    char c;
+    scanf("%c", &c);
+
+    // Check what version of the museum is opened
+    sem_t *workA = sem_open("/workA", O_EXCL);
+    if (workA == SEM_FAILED) {
+        // time of leaving B
+        while (f > 0) {
+            fork();
+            f--;
+        }
+        pid_t pid = getpid();
+        srand(pid);
+
+        int time;
+        sleep(rand() % 5);
+        while (1) {
+            fprintf(stdout, "[V#%d] waiting A\n", pid);
+            sem_wait(hallA);
+            time = rand() % 10 + 2;
+            fprintf(stdout, "[V#%d] entered A, watching for %ds\n", pid, time);
+            sleep(time);
+            fprintf(stdout, "[V#%d] leaving A\n", pid);
+            sleep(1);
+            sem_post(hallA);
+            fprintf(stdout, "[V#%d] left A\n", pid);
+            sleep(rand() % 10 + 2);
+        }
+    } else {
+        // no. of visitors
+        while (f > 0) {
+            fork();
+            f--;
+        }
+        pid_t pid = getpid();
+        srand(pid);
+
+        int time;
+        sleep(rand() % 5);
+        while (1) {
+            fprintf(stdout, "[V#%d] waiting A\n", pid);
+            sem_wait(workA);
+            sem_wait(hallA); // only to decrease count in hallA
+            time = rand() % 10 + 2;
+            fprintf(stdout, "[V#%d] entered A, watching for %ds\n", pid, time);
+            sleep(time);
+            fprintf(stdout, "[V#%d] leaving A\n", pid);
+            sleep(1);
+            sem_post(workA);
+            sem_post(hallA);
+            fprintf(stdout, "[V#%d] left A\n", pid);
+            sleep(rand() % 10 + 2);
+        }
     }
 }
 
 void museumAddB(const int x) {
-    switch (x) {
-        case 1:
-            // todo
-            break;
-        case 2:
-            // todo
-            break;
-        case 4:
-            // todo
-            break;
-        case 8:
-            // todo
-            break;
-        default:
-            fprintf(stdout, "Wrong number of visitors\n\n");
-    }
+
 }
