@@ -288,7 +288,6 @@ void museumAddB(const int x) {
             fprintf(stdout, "[V#%d] entered B, watching for %ds\n", pid, time);
             sem_post(workA);
             sem_post(hallA);
-            //sem_post(workA);
             sleep(time);
 
             fprintf(stdout, "[V#%d] leaving B\n", pid);

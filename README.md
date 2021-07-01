@@ -40,8 +40,6 @@ There's an option to achieve a guaranteed free space in A by making people enter
 
 ## Example invocation
 
-***todo***
-
 ### Disclaimer
 Adding visitors differentiates between "only A" and "A and B" visitors. However, from the algorithms' points of view, there is no distinction between those. It is unaware of that and that's why the no distinction property holds.
 
@@ -69,6 +67,36 @@ Adding visitors:            (X = 1, 2, 4 or 8)
   ./museum A X              adds X visitors that will not enter B
   ./museum B X              adds X visitors that will enter B
 ```
+In general, the approach is as follows:
+1. Create one of the museum instances
+2. Add as many A and B visitors as you want (the program waits for ctrl+D, so that you can first add all the visitors)
+3. Run the visitors - they are distinguished by their pid's. Their status, as well as the museum's can be monitored.
+4. After finishing and ending all the processes by ctrl+C, run `./museum dst` to unlink the created semaphores
+
+Below are exemplary, specific invocations - step by step. The commands should be run in separate terminals, unless stated otherwise.
 
 ### Maximize visitors - step by step
-Create museum with Na and Nb capacities using `./museum crt no Na Nb`. In separate terminals, add the visitors using supported 
+(museum specifications: Na = 10, Nb = 5, 8A, 6B visitors)
+
+1. `./museum crt no 10 5` - this terminal will enable monitoring the museum's state
+2. `./museum A 8` - terminal dedicated to 8 A visitors
+4. `./museum B 4` - terminal dedicated to the first 4 B visitors
+5. `./museum B 2` - terminal dedicated to the last 2 B visitor
+6. `ctrl+D` in all visitors' terminals to run them relatively close to each other
+
+At this point, you can watch how the visitors interact with the museum, hall occupation, the working A occupation (max limit is always `Na - 1`), and the time elapsed since start.
+
+7. `ctrl+C` in all terminals to terminate the processes
+8. `./museum dst` in one of the terminals to unlink the semaphores
+
+### Minimize time of exiting hall B - step by step
+(museum specifications: Na = 9, Nb = 6, 10A, 9B visitors)
+
+1. `./museum crt time 9 6` - this terminal will enable monitoring the museum's state
+2. `./museum A 8` - terminal dedicated to the first 8 A visitors
+3. `./museum A 2` - terminal dedicated to the last 2 A visitors
+4. `./museum B 8` - terminal dedicated to the first 8 B visitors
+5. `./museum B 1` - terminal dedicated to the last 1 B visitor
+6. `ctrl+D` in all visitors' terminals to run them relatively close to each other
+
+At this point, you can watch how the visitors interact with the museum, hall occupation, A hall occupation with reserved spot for every B visitor, and the time elapsed since start. Also, each B visitor shows its time of exiting the museum starting from B. This time is equal to 2 seconds (1 for exiting B, 1 for exiting A) with some insignificant fraction. There is always a place in A for every B visitor. That means the fraction comes from the time of two `sem_post` operations.
