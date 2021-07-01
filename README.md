@@ -8,14 +8,15 @@ Prepare solution for one of the final assignments from the course book:
   - leaving the museum by people visiting hall B in the shortest possible time
 - **Producer-consumer problem revisited** - Write a program implementing producer and the consumer in a generalized version that makes it possible to run several prod. and cons. at the same time. A buffer of N slots should allow for running up to N concurrent processes, producing and consuming different items. The processes should run in loops with different and variable speeds. The ordering of items being consumed should reflect production and times.
 
+I chose the first problem.
+
 ## Solution
-I chose the first problem. While designing the solution, we have to take into account deadlock possibility. 
 
 ### Disclaimer
-The solution depends on whether we know the visitors' intentions in advance. The point is, with such a setup there is a possibility for a deadlock. It happens if both B and A are full and all the people from A want to visit B instead of walk out.
+The solution depends on whether we know the visitors' intentions in advance or not. The point is, with such a setup there is a deadlock possibility. It happens if both B and A are full and all the people from A want to visit B instead of walk out. I consider both cases below.
 
 ### Intentions known in advance
-If we know in advance, a synchronization algorithm can be implemented, such that it prevents deadlock. Then the whole hall capacities can be used. It may be achieved using an additional medium - a gatekeeper. The gatekeeper would let people in or make them wait, according to the current conditions in A and B. People are let in A such that there is always either free space or a one person which does not visit B. If a visitor in B wants to leave, it lets the gatekeeper know. If there are people willing to leave B and A is full, the gatekeeper would prevent new visitors from coming in. As soon as (possibly the only) person from A which does not want to visit B exits, willing people exit B. Once that happens, the new visitors may enter.
+If the intentions are known, a synchronization algorithm can be implemented such that it prevents deadlock. Then the whole hall capacities can be used. It may be achieved using an additional medium - a gatekeeper. The gatekeeper would let people in or make them wait, according to the current conditions in A and B. People are let in A such that there is always either free space or at least one person which does not visit B. If a visitor in B wants to leave, it lets the gatekeeper know. If there are people willing to leave B and A is full, the gatekeeper would prevent new visitors from coming in. As soon as (possibly the only) person from A which does not want to visit B leaves, people may exit B. Once that happens, the new visitors may enter.
 
 ### Intentions not known in advance
 If not, the simpliest (and only, if we don't want to force the visitors out) option is to prevent deadlock by letting at max `Na - 1` people to A at the same time. I think deadlock prevention is the best option for this exact application. One could approach the problem by detecting and recovering from deadlock, but that would require forcing at least one person from A out and the museum's rating would go down really fast ;)
@@ -36,16 +37,16 @@ For that reason, the only restriction placed is the deadlock prevention - always
 ### 2. Leaving the museum by people visiting hall B in the shortest possible time
 This part of the exercise could be optimized without the real-world limitations. Keep in mind leaving B and then A would take some time just to get to the doors. The shortest time of leaving B is allowed if the algorithm ensures there's always a free place in A whenever someone exits B. As discussed previously, forcing people out of A is outrageous and everyone's time of visit is not known.
 
-There's an option to achieve a guaranteed free space in A by making people entering B still taking up a place in A. That gets rid off the problem of having a single reserved space in A, but also reduces the maximum working capacity of the whole museum to just `Na`. For that reason, in real life such an algorithm could be optimized by finding the best number of places in A reserved for people leaving B. But for the sake of this task, the algorithm will reserve a place for each B visitor.
+There's an option to achieve a guaranteed free space in A by making people entering B still hold up a place in A. That gets rid off the deadlock problem (`Na` people can be visiting A at the same time), but also makes the whole museum's capacity just `Na`. For that reason, in real life such an algorithm could be optimized by finding the best number of places in A reserved for people leaving B. But for the sake of this task, the algorithm will reserve a place for each B visitor.
 
 ## Example invocation
 
 ### Disclaimer
-Adding visitors differentiates between "only A" and "A and B" visitors. However, from the algorithms' points of view, there is no distinction between those. It is unaware of that and that's why the no distinction property holds.
+Adding visitors differentiates between "only A" and "A and B" visitors. However, from the algorithms' points of view, there is no distinction between those. They are unaware of that and that's why the "no distinction" property holds.
 
 Also, the added visitors will be coming back after some time. The fact they're the same processes doesn't play any role.
 
-### Main entry point
+### How to start?
 Run the `Makefile`. The whole project is built around the `./museum` executable. It is the main entry point to all the functionalities. By executing
 ```
 ./museum man
@@ -71,7 +72,7 @@ In general, the approach is as follows:
 1. Create one of the museum instances
 2. Add as many A and B visitors as you want (the program waits for ctrl+D, so that you can first add all the visitors)
 3. Run the visitors - they are distinguished by their pid's. Their status, as well as the museum's can be monitored.
-4. After finishing and ending all the processes by ctrl+C, run `./museum dst` to unlink the created semaphores
+4. After finishing and ending all the processes with ctrl+C, run `./museum dst` to unlink the created semaphores
 
 Below are exemplary, specific invocations - step by step. The commands should be run in separate terminals, unless stated otherwise.
 
@@ -100,3 +101,6 @@ At this point, you can watch how the visitors interact with the museum, hall occ
 6. `ctrl+D` in all visitors' terminals to run them relatively close to each other
 
 At this point, you can watch how the visitors interact with the museum, hall occupation, A hall occupation with reserved spot for every B visitor, and the time elapsed since start. Also, each B visitor shows its time of exiting the museum starting from B. This time is equal to 2 seconds (1 for exiting B, 1 for exiting A) with some insignificant fraction. There is always a place in A for every B visitor. That means the fraction comes from the time of two `sem_post` operations.
+
+7. `ctrl+C` in all terminals to terminate the processes
+8. `./museum dst` in one of the terminals to unlink the semaphores
